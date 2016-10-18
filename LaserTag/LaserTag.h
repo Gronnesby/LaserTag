@@ -1,18 +1,29 @@
 #ifndef __LASER_TAG_H__
 #define __LASER_TAG_H__
 
+#if ARDUINO >= 100
+    #include "Arduino.h"
+#else
+    #include "WProgram.h"
+    #include "pins_arduino.h"
+    #include "WConstants.h"
+#endif
 
-class LaserTag
+enum Sound : unsigned char
+{
+    FIRE,
+    CLICK,
+    SHOT
+};
+
+class LaserEquipment
 {
     public:
-        LaserTag(unsigned char player_number, bool vest);
-        unsigned char ReadSignal();
+        void playSound(Sound s);
 
     private:
-        bool _vest;
-        unsigned char _player_number;
-}
-
-
+        const unsigned char m_playerNumber;
+        const unsigned int m_comPin;
+};
 
 #endif

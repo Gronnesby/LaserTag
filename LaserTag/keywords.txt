@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map For LaserTag
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LaserGun	KEYWORD1
+LaserVest   KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+Trigger KEYWORD2
+fadeTo	KEYWORD2
+getFade	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
