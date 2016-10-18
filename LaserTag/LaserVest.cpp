@@ -12,7 +12,8 @@ LaserVest::LaserVest(unsigned char playerNumber, unsigned int gunComPin)
     digitalWrite(m_comPin, HIGH);
 }
 
-
+/* Disable the weapon by writing low to the communcation pin.
+ */
 void LaserVest::disableWeapon()
 {
     digitalWrite(m_comPin, LOW);

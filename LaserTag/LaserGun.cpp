@@ -64,5 +64,5 @@ void LaserGun::fire()
  */
 bool LaserGun::canFire()
 {
-    return (digitalRead(m_comPin) == HIGH)
+    return (digitalRead(m_comPin) == HIGH);
 }
