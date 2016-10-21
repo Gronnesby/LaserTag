@@ -3,32 +3,8 @@
 
 
 /* LASER TAG GUN IMPLEMENTATION
- * Constructor for the Laser Gun class
  */
-LaserGun::LaserGun(unsigned char player_number, unsigned int triggerPin, unsigned int vestComPin)
-{
-    m_playerNumber = playerNumber;
-    m_comPin = vestComPin;
-    m_triggerPin = triggerPin;
-}
 
-/* Method for playing a sound from the gun.
- *
- */
-void LaserGun::playSound(Sound s)
-{
-    switch(s)
-    {
-        case FIRE:
-            // Play a fire sound
-            break;
-        case CLICK:
-            // Play a click sound
-            break;
-        default:
-            break;
-    }
-}
 
 /* Debounce method for the guns trigger.
  * This method should either directly call fire,
@@ -36,7 +12,36 @@ void LaserGun::playSound(Sound s)
  */
 void LaserGun::trigger()
 {
+    Serial.println(m_debounce.currentState, DEC);
+    if ((m_debounce.lastTime + c_debounceTime) > millis())
+    {
+        return;
+    }
+    m_debounce.lastTime = millis();
 
+    if (millis() < m_debounce.lastTime)
+    {
+        m_debounce.lastTime = millis();
+    }
+    m_debounce.currentState = digitalRead(m_triggerPin);
+    Serial.println(m_debounce.currentState, DEC);
+    if (m_debounce.currentState ==  m_debounce.previousState)
+    {
+        if (m_debounce.pressed == LOW && m_debounce.currentState == LOW)
+        {
+            m_debounce.justPressed = 1;
+        }
+        else if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
+        {
+            m_debounce.justReleased = 1;
+        }
+        m_debounce.pressed = !m_debounce.currentState;
+    }
+
+    if (m_debounce.justPressed)
+    {
+        fire();
+    }
 }
 
 
@@ -46,17 +51,11 @@ void LaserGun::trigger()
  */
 void LaserGun::fire()
 {
-    if (canFire())
-    {
-        // Fire the laser OR invoke interrupt to fire the gun
+    digitalWrite(m_firePin, HIGH);
+    delay(150);
+    digitalWrite(m_firePin, LOW);
 
-        playSound(FIRE);
-    }
-    else
-    {
-        // Just play a click sound
-        playSound(CLICK);
-    }
+
 }
 
 /* Communicates with the vest and checks wether
@@ -65,4 +64,9 @@ void LaserGun::fire()
 bool LaserGun::canFire()
 {
     return (digitalRead(m_comPin) == HIGH);
+}
+
+void LaserGun::isDead()
+{
+
 }

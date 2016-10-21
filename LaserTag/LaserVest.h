@@ -3,15 +3,22 @@
 
 #include "LaserTag.h"
 
+
+
 class LaserVest : public LaserEquipment
 {
     public:
-        LaserVest(unsigned char playerNumber);
+        LaserVest(uint playernum, uint comPin, ulong gracePeriod)
+        : LaserEquipment(playernum, comPin),
+        m_deathTimePenalty(gracePeriod)
+        {
+            digitalWrite(m_comPin, HIGH);
+        }
         void disableWeapon();
 
     private:
         void enableWeapon();
-        const unsigned long m_deathTimePenalty;
+        ulong m_deathTimePenalty;
 };
 
 #endif

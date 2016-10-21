@@ -9,7 +9,12 @@
     #include "WConstants.h"
 #endif
 
-enum Sound : unsigned char
+typedef unsigned int uint;
+typedef unsigned long ulong;
+typedef unsigned char byte;
+
+
+enum Sound : byte
 {
     FIRE,
     CLICK,
@@ -19,11 +24,16 @@ enum Sound : unsigned char
 class LaserEquipment
 {
     public:
+        LaserEquipment(uint playernum, uint comPin)
+        {
+          m_playerNumber = playernum;
+          m_comPin = comPin;
+        }
         void playSound(Sound s);
 
-    private:
-        const unsigned char m_playerNumber;
-        const unsigned int m_comPin;
+    protected:
+        byte m_playerNumber;
+        uint m_comPin;
 };
 
 #endif
