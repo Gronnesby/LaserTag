@@ -3,6 +3,7 @@
 
 #include "LaserTag.h"
 #include "TimerOne.h"
+#include "Manchester.h"
 
 const long c_deltaSendTime = 120;
 const long c_debounceTime = 10;
@@ -32,6 +33,7 @@ class LaserGun : public LaserEquipment
             pinMode(triggerPin, INPUT);
             pinMode(firePin, OUTPUT);
             timer.initialize();
+            man.setupTransmit(firePin);
         }
         void trigger();
 
@@ -43,6 +45,7 @@ class LaserGun : public LaserEquipment
 
         uint m_triggerPin;
         uint m_firePin;
+        Manchester man;
 };
 
 

@@ -32,7 +32,7 @@ class LaserEquipment
         void playSound(Sound s);
 
     protected:
-        byte m_playerNumber;
+        uint16_t m_playerNumber;
         uint m_comPin;
 };
 

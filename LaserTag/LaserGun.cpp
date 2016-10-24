@@ -45,7 +45,6 @@ void LaserGun::trigger()
         {
             if (!m_debounce.justPressed)
             {
-                Serial.println(m_debounce.justPressed);
                 m_debounce.justPressed = 1;
                 fire();
             }
