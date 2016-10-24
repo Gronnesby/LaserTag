@@ -1,10 +1,30 @@
 
 #include "LaserGun.h"
 
-
 /* LASER TAG GUN IMPLEMENTATION
  */
 
+buttonDebounce_t m_debounce;
+TimerOne timer;
+
+void triggerRelease()
+{
+    if (m_debounce.justPressed == 1)
+    {
+        m_debounce.justPressed = 0;
+    }
+}
+
+void LaserGun::sendHeader()
+{
+    int i, k = 5;
+    for (i = 0; i < k; i++)
+    {
+        digitalWrite(m_firePin, HIGH);
+        delayMicroseconds(10000);
+
+    }
+}
 
 /* Debounce method for the guns trigger.
  * This method should either directly call fire,
@@ -12,36 +32,27 @@
  */
 void LaserGun::trigger()
 {
-    Serial.println(m_debounce.currentState, DEC);
     if ((m_debounce.lastTime + c_debounceTime) > millis())
     {
         return;
     }
     m_debounce.lastTime = millis();
-
-    if (millis() < m_debounce.lastTime)
-    {
-        m_debounce.lastTime = millis();
-    }
     m_debounce.currentState = digitalRead(m_triggerPin);
-    Serial.println(m_debounce.currentState, DEC);
+
     if (m_debounce.currentState ==  m_debounce.previousState)
     {
         if (m_debounce.pressed == LOW && m_debounce.currentState == LOW)
         {
-            m_debounce.justPressed = 1;
-        }
-        else if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
-        {
-            m_debounce.justReleased = 1;
+            if (!m_debounce.justPressed)
+            {
+                Serial.println(m_debounce.justPressed);
+                m_debounce.justPressed = 1;
+                fire();
+            }
         }
         m_debounce.pressed = !m_debounce.currentState;
     }
-
-    if (m_debounce.justPressed)
-    {
-        fire();
-    }
+    m_debounce.previousState = m_debounce.currentState;
 }
 
 
@@ -51,11 +62,19 @@ void LaserGun::trigger()
  */
 void LaserGun::fire()
 {
-    digitalWrite(m_firePin, HIGH);
-    delay(150);
+    long t = millis();
+    int i;
+    while((millis() - t) < c_deltaSendTime)
+    {
+        sendHeader();
+        for (i = 0; i < 8; i++)
+        {
+            digitalWrite(m_firePin, ((m_playerNumber >> i) & 0xFF));
+            delayMicroseconds(10000);
+        }
+    }
     digitalWrite(m_firePin, LOW);
-
-
+    triggerRelease();
 }
 
 /* Communicates with the vest and checks wether

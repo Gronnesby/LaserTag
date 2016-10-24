@@ -2,8 +2,11 @@
 #define __LASER_GUN_H__
 
 #include "LaserTag.h"
+#include "TimerOne.h"
 
+const long c_deltaSendTime = 120;
 const long c_debounceTime = 10;
+extern TimerOne timer;
 
 struct buttonDebounce
 {
@@ -13,8 +16,8 @@ struct buttonDebounce
 
     byte pressed;
     byte hold;
-    byte justPressed;
-    byte justReleased;
+    volatile byte justPressed;
+    volatile byte justReleased;
 };
 typedef struct buttonDebounce buttonDebounce_t;
 
@@ -28,18 +31,18 @@ class LaserGun : public LaserEquipment
         {
             pinMode(triggerPin, INPUT);
             pinMode(firePin, OUTPUT);
+            timer.initialize();
         }
         void trigger();
 
     private:
+        void sendHeader();
         void fire();
         bool canFire();
         void isDead();
 
         uint m_triggerPin;
         uint m_firePin;
-        buttonDebounce_t m_debounce;
-
 };
 
 
