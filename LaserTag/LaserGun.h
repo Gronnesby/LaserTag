@@ -38,7 +38,6 @@ class LaserGun : public LaserEquipment
         void trigger();
 
     private:
-        void sendHeader();
         void fire();
         bool canFire();
         void isDead();

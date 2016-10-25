@@ -61,18 +61,8 @@ void LaserGun::trigger()
  */
 void LaserGun::fire()
 {
-    long t = millis();
-    int i;
-    while((millis() - t) < c_deltaSendTime)
-    {
-        sendHeader();
-        for (i = 0; i < 8; i++)
-        {
-            digitalWrite(m_firePin, ((m_playerNumber >> i) & 0xFF));
-            delayMicroseconds(10000);
-        }
-    }
-    digitalWrite(m_firePin, LOW);
+
+    man.transmit((uint16_t)m_playerNumber);
     triggerRelease();
 }
 

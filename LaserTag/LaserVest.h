@@ -5,26 +5,34 @@
 #include "Manchester.h"
 
 
+enum
+
 class LaserVest : public LaserEquipment
 {
     public:
-        LaserVest(uint playernum, uint comPin, ulong gracePeriod, uint sensorPin)
-        : LaserEquipment(playernum, comPin),
+        // Constructor and parent object initialization.
+        LaserVest(uint playernum, uint comPin, ulong gracePeriod, uint sensorPin) : LaserEquipment(playernum, comPin),
         m_deathTimePenalty(gracePeriod),
         m_sensorPin(sensorPin)
         {
             pinMode(sensorPin, INPUT);
             digitalWrite(m_comPin, HIGH);
             man.setupReceive(sensorPin);
-            man.beginReceiveArray(2, buf);
+            man.beginReceive();
         }
+
+        // Disables the weapon by communicating over the compin, does nothing if weapon is aleady disabled
         void disableWeapon();
+
+        // Receives a message over the registered sensorpin
         int receive();
 
     private:
+        // Enables weapon, does nothing if the weapon is enabled
         void enableWeapon();
-        uint8_t buf[2];
+
         ulong m_deathTimePenalty;
+        Status m_weaponStatus;
         uint m_sensorPin;
         Manchester man;
 };

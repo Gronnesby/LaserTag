@@ -14,11 +14,17 @@ typedef unsigned long ulong;
 typedef unsigned char byte;
 
 
+enum Status : int
+{
+    ENABLED,
+    DISABLED
+};
+
 enum Sound : byte
 {
     FIRE,
     CLICK,
-    SHOT
+    HIT
 };
 
 class LaserEquipment

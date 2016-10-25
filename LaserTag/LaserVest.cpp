@@ -10,19 +10,17 @@
  */
 void LaserVest::disableWeapon()
 {
+    
+
     digitalWrite(m_comPin, LOW);
 }
 
 int LaserVest::receive()
 {
-    if(man.receiveComplete())
-    {
-        Serial.println(buf[0]);
-        uint16_t msg = 0;
-        msg |= (buf[0] << 8);
-        msg |= buf[1];
-        return msg;
-    }
 
+    if (man.receiveComplete())
+    {
+
+    }
     return 0;
 }
