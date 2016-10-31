@@ -2,7 +2,7 @@
 #define __LASER_VEST_H__
 
 #include "LaserTag.h"
-#include "Manchester.h"
+
 
 class LaserVest : public LaserEquipment
 {
@@ -31,7 +31,6 @@ class LaserVest : public LaserEquipment
         ulong m_deathTimePenalty;
         Status m_weaponStatus;
         uint m_sensorPin;
-        Manchester man;
 };
 
 #endif

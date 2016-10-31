@@ -9,6 +9,8 @@
     #include "WConstants.h"
 #endif
 
+#include "Manchester.h"
+
 typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef unsigned char byte;

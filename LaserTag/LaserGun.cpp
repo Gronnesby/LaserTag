@@ -52,7 +52,7 @@ void LaserGun::fire()
 {
     if (canFire())
     {
-        man.transmit((uint16_t)m_playerNumber);
+        man.transmit(m_playerNumber);
     }
     else
     {
@@ -66,7 +66,7 @@ void LaserGun::fire()
  */
 bool LaserGun::canFire()
 {
-    return (digitalRead(m_comPin) == HIGH);
+    return true; //(digitalRead(m_comPin) == HIGH);
 }
 
 void LaserGun::isDead()

@@ -2,7 +2,6 @@
 #define __LASER_GUN_H__
 
 #include "LaserTag.h"
-#include "Manchester.h"
 
 const long c_deltaSendTime = 120;
 const long c_debounceTime = 10;
@@ -33,15 +32,15 @@ class LaserGun : public LaserEquipment
             man.setupTransmit(firePin, MAN_300);
         }
         void trigger();
+        void fire();
 
     private:
-        void fire();
+
         bool canFire();
         void isDead();
 
         uint m_triggerPin;
         uint m_firePin;
-        Manchester man;
 };
 
 
