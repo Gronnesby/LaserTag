@@ -10,17 +10,24 @@
  */
 void LaserVest::disableWeapon()
 {
-    
+
 
     digitalWrite(m_comPin, LOW);
 }
 
-int LaserVest::receive()
+uint16_t LaserVest::receive()
 {
 
     if (man.receiveComplete())
     {
+        // Get the message
+        uint16_t m = man.getMessage();
 
+        // Begin listening for next message
+        man.beginReceive();
+
+        // Return the message
+        return m;
     }
     return 0;
 }

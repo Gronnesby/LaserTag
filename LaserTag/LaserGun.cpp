@@ -5,7 +5,6 @@
  */
 
 buttonDebounce_t m_debounce;
-TimerOne timer;
 
 void triggerRelease()
 {
@@ -15,16 +14,6 @@ void triggerRelease()
     }
 }
 
-void LaserGun::sendHeader()
-{
-    int i, k = 5;
-    for (i = 0; i < k; i++)
-    {
-        digitalWrite(m_firePin, HIGH);
-        delayMicroseconds(10000);
-
-    }
-}
 
 /* Debounce method for the guns trigger.
  * This method should either directly call fire,
@@ -61,8 +50,14 @@ void LaserGun::trigger()
  */
 void LaserGun::fire()
 {
-
-    man.transmit((uint16_t)m_playerNumber);
+    if (canFire())
+    {
+        man.transmit((uint16_t)m_playerNumber);
+    }
+    else
+    {
+        // Play click sound
+    }
     triggerRelease();
 }
 

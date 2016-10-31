@@ -4,9 +4,6 @@
 #include "LaserTag.h"
 #include "Manchester.h"
 
-
-enum
-
 class LaserVest : public LaserEquipment
 {
     public:
@@ -17,7 +14,7 @@ class LaserVest : public LaserEquipment
         {
             pinMode(sensorPin, INPUT);
             digitalWrite(m_comPin, HIGH);
-            man.setupReceive(sensorPin);
+            man.setupReceive(sensorPin, MAN_300);
             man.beginReceive();
         }
 
@@ -25,7 +22,7 @@ class LaserVest : public LaserEquipment
         void disableWeapon();
 
         // Receives a message over the registered sensorpin
-        int receive();
+        uint16_t receive();
 
     private:
         // Enables weapon, does nothing if the weapon is enabled

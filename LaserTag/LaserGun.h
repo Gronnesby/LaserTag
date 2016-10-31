@@ -2,12 +2,10 @@
 #define __LASER_GUN_H__
 
 #include "LaserTag.h"
-#include "TimerOne.h"
 #include "Manchester.h"
 
 const long c_deltaSendTime = 120;
 const long c_debounceTime = 10;
-extern TimerOne timer;
 
 struct buttonDebounce
 {
@@ -32,8 +30,7 @@ class LaserGun : public LaserEquipment
         {
             pinMode(triggerPin, INPUT);
             pinMode(firePin, OUTPUT);
-            timer.initialize();
-            man.setupTransmit(firePin);
+            man.setupTransmit(firePin, MAN_300);
         }
         void trigger();
 
