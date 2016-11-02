@@ -8,29 +8,30 @@ class LaserVest : public LaserEquipment
 {
     public:
         // Constructor and parent object initialization.
-        LaserVest(uint playernum, uint comPin, ulong gracePeriod, uint sensorPin) : LaserEquipment(playernum, comPin),
-        m_deathTimePenalty(gracePeriod),
-        m_sensorPin(sensorPin)
+        LaserVest(int playernum, int comPin, int sensorPin) : LaserEquipment(playernum, comPin),
+        m_irrecv(sensorPin)
         {
-            pinMode(sensorPin, INPUT);
             digitalWrite(m_comPin, HIGH);
-            man.setupReceive(sensorPin, MAN_300);
-            man.beginReceive();
+            m_upgrades = NONE;
+            m_irrecv.enableIRIn();
         }
+
+        // Receives a message over the registered sensorpin
+        uint32_t receive();
+
+    private:
 
         // Disables the weapon by communicating over the compin, does nothing if weapon is aleady disabled
         void disableWeapon();
 
-        // Receives a message over the registered sensorpin
-        uint16_t receive();
-
-    private:
         // Enables weapon, does nothing if the weapon is enabled
         void enableWeapon();
 
-        ulong m_deathTimePenalty;
-        Status m_weaponStatus;
-        uint m_sensorPin;
+        void applyStatus(uint16_t options);
+
+        int m_sensorPin;
+        uint16_t m_upgrades;
+        IRrecv m_irrecv;
 };
 
 #endif

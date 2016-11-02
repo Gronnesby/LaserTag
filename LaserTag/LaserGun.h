@@ -3,14 +3,15 @@
 
 #include "LaserTag.h"
 
-const long c_deltaSendTime = 120;
+
+// Global constants
 const long c_debounceTime = 10;
 
 struct buttonDebounce
 {
     byte previousState;
     byte currentState;
-    ulong lastTime;
+    long lastTime;
 
     byte pressed;
     byte hold;
@@ -22,25 +23,31 @@ typedef struct buttonDebounce buttonDebounce_t;
 class LaserGun : public LaserEquipment
 {
     public:
-        LaserGun(uint playernum, uint comPin, uint triggerPin, uint firePin)
+        LaserGun(int playernum, int comPin, int triggerPin, int firePin)
         : LaserEquipment(playernum, comPin),
         m_triggerPin(triggerPin),
         m_firePin(firePin)
         {
             pinMode(triggerPin, INPUT);
             pinMode(firePin, OUTPUT);
-            man.setupTransmit(firePin, MAN_300);
         }
+        // Trigger function with button debouncing
         void trigger();
-        void fire();
 
     private:
 
-        bool canFire();
-        void isDead();
+        // Fire function for sending an IR signal
+        void fire();
 
-        uint m_triggerPin;
-        uint m_firePin;
+        // Communication with the vest to check if we can fire
+        bool canFire();
+
+        uint16_t getUpgrades();
+
+        int m_triggerPin;
+        int m_firePin;
+        uint16_t upgrades;
+        IRsend irsend;
 };
 
 

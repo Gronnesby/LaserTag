@@ -9,20 +9,25 @@
     #include "WConstants.h"
 #endif
 
-#include "Manchester.h"
+#include <IRremote.h>
 
-typedef unsigned int uint;
-typedef unsigned long ulong;
-typedef unsigned char byte;
+const uint32_t STATUS_MASK = 0xFFFF0000;
+const uint32_t PLAYER_MASK = 0x0000FFFF;
 
-
-enum Status : int
+enum
 {
-    ENABLED,
-    DISABLED
+    NONE = 0x0000,
+    TEAM_A = 0x0001,
+    TEAM_B = 0x0002,
+    UPGRADE_RAPID = 0x0004,
+    UPGRADE_INVULN = 0x0008,
+    UPGRADE_INVIS = 0x0010,
+    UPGRADE_SPY = 0x0020,
+    GAME_RESET = 0x0040,
+    UPGRADES = 0x0080
 };
 
-enum Sound : byte
+enum SOUND : byte
 {
     FIRE,
     CLICK,
@@ -32,16 +37,16 @@ enum Sound : byte
 class LaserEquipment
 {
     public:
-        LaserEquipment(uint playernum, uint comPin)
+        LaserEquipment(int playernum, int comPin) : m_playerNumber(playernum), m_comPin(comPin)
         {
-          m_playerNumber = playernum;
-          m_comPin = comPin;
         }
-        void playSound(Sound s);
+        void playSound(SOUND s);
 
     protected:
-        uint16_t m_playerNumber;
-        uint m_comPin;
+        const int m_comPin;
+        const unsigned int m_playerNumber;
+        uint16_t m_team;
+
 };
 
 #endif
