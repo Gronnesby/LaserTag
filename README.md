@@ -1,7 +1,7 @@
 # Arduino Laser Tag Library
 ## Kodeklubben Tromsø
 
-This Arduino library is used at Kodeklubben Tromsø and Vitensenteret's Makerlab.
+This Arduino library is used at [Kodeklubben Tromsø](kodeklubben-tromso.github.io) and [Vitensenteret Makerlab]().
 
 
 # Third Party Libraries
