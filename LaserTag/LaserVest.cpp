@@ -5,30 +5,30 @@
 /* LASER TAG VEST IMPLEMENTATION
  */
 
-
-
-
-uint32_t LaserVest::receive()
+ void LaserVest::receive()
 {
-    decode_results results;
-    if (m_irrecv.decode(&results))
-    {
-        uint16_t playernum = results.value & PLAYER_MASK;
-        uint16_t statuscode = (results.value & STATUS_MASK) >> 16;
 
-        applyStatus(statuscode);
+      unsigned long val = 0;
+      unsigned long plnum = 0;
+      unsigned long upgrd = 0;
 
-        return results.value;
-    }
-
-    return 0;
+      if (m_irrecv.decode(&m_res)) {
+        val = m_res.value;
+        Serial.println(val, BIN);
+        upgrd = (val >> 16);
+        plnum = (val & 0x0000FFFF);
+        Serial.println(upgrd, DEC);
+        Serial.println(plnum, DEC);
+        m_irrecv.resume(); // Receive the next value
+      }
+      delay(10);
 }
 
 /* Disable the weapon by writing LOW to the communcation pin.
  */
 void LaserVest::disableWeapon()
 {
-    digitalWrite(m_comPin, LOW);
+    digitalWrite(m_compin, LOW);
 
     // Should probably set up a enable weapon timed interrupt here
     // Or at least count down in the receive method
@@ -39,7 +39,7 @@ void LaserVest::disableWeapon()
  */
 void LaserVest::enableWeapon()
 {
-    digitalWrite(m_comPin, HIGH);
+    digitalWrite(m_compin, HIGH);
 }
 
 

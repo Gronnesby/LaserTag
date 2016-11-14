@@ -1,9 +1,8 @@
 
 #include <LaserVest.h>
 
-
 // LaserVest object, Args: int playernum, int compin, long graceperiod, int sensorpin
-LaserVest vest(23, 1, 3);
+LaserVest vest(23, TEAM_B, 1, 5);
 
 void setup(void)
 {
@@ -13,11 +12,5 @@ void setup(void)
 
 void loop(void)
 {
-
-    uint32_t sig = vest.receive();
-    if (sig)
-    {
-        Serial.println(sig);
-    }
-
+  vest.receive();
 }

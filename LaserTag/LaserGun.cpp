@@ -2,15 +2,14 @@
 #include "LaserGun.h"
 
 /* LASER TAG GUN IMPLEMENTATION
- */
+*/
 
-buttonDebounce_t m_debounce;
-
-void triggerRelease()
+void LaserGun::triggerRelease()
 {
     if (m_debounce.justPressed == 1)
     {
         m_debounce.justPressed = 0;
+        digitalWrite(m_laserpin, LOW);
     }
 }
 
@@ -26,7 +25,7 @@ void LaserGun::trigger()
         return;
     }
     m_debounce.lastTime = millis();
-    m_debounce.currentState = digitalRead(m_triggerPin);
+    m_debounce.currentState = digitalRead(m_triggerpin);
 
     if (m_debounce.currentState ==  m_debounce.previousState)
     {
@@ -52,12 +51,19 @@ void LaserGun::fire()
 {
     if (canFire())
     {
-        irsend.sendRaw(&m_playerNumber, sizeof(int), 38);
+        unsigned long msg = 0;
+        msg = (((unsigned long) m_team) << 16) | ((unsigned long) m_playernum);
+        Serial.println(msg, BIN);
+        Serial.println(sizeof(long));
+        digitalWrite(m_laserpin, HIGH);
+        m_irsend.sendSony(msg, nbits);
+
     }
     else
     {
         // Play click sound
     }
+
     triggerRelease();
 }
 

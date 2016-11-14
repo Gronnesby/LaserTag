@@ -34,19 +34,6 @@ enum SOUND : byte
     HIT
 };
 
-class LaserEquipment
-{
-    public:
-        LaserEquipment(int playernum, int comPin) : m_playerNumber(playernum), m_comPin(comPin)
-        {
-        }
-        void playSound(SOUND s);
 
-    protected:
-        const int m_comPin;
-        const unsigned int m_playerNumber;
-        uint16_t m_team;
-
-};
 
 #endif

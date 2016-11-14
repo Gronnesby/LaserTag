@@ -6,6 +6,8 @@
 
 // Global constants
 const long c_debounceTime = 10;
+const int nbits = sizeof(unsigned long) * 8;
+
 
 struct buttonDebounce
 {
@@ -20,16 +22,25 @@ struct buttonDebounce
 };
 typedef struct buttonDebounce buttonDebounce_t;
 
-class LaserGun : public LaserEquipment
+class LaserGun
 {
     public:
-        LaserGun(int playernum, int comPin, int triggerPin, int firePin)
-        : LaserEquipment(playernum, comPin),
-        m_triggerPin(triggerPin),
-        m_firePin(firePin)
+        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin) :
+        m_playernum(playernum),
+        m_triggerpin(triggerpin),
+        m_firepin(firepin),
+        m_compin(compin),
+        m_laserpin(laserpin),
+        m_irsend(IRsend())
         {
-            pinMode(triggerPin, INPUT);
-            pinMode(firePin, OUTPUT);
+            m_upgrades = NONE;
+            m_team = TEAM_A;
+
+            m_debounce = buttonDebounce_t{};
+
+            pinMode(m_triggerpin, INPUT);
+            pinMode(m_firepin, OUTPUT);
+            pinMode(m_laserpin, OUTPUT);
         }
         // Trigger function with button debouncing
         void trigger();
@@ -42,12 +53,22 @@ class LaserGun : public LaserEquipment
         // Communication with the vest to check if we can fire
         bool canFire();
 
+        // Release the trigger
+        void triggerRelease();
+
         uint16_t getUpgrades();
 
-        int m_triggerPin;
-        int m_firePin;
-        uint16_t upgrades;
-        IRsend irsend;
+        int m_triggerpin;
+        int m_firepin;
+        int m_compin;
+        int m_laserpin;
+
+        buttonDebounce_t m_debounce;
+
+        uint16_t m_playernum;
+        uint16_t m_team;
+        uint16_t m_upgrades;
+        IRsend m_irsend;
 };
 
 

@@ -4,20 +4,26 @@
 #include "LaserTag.h"
 
 
-class LaserVest : public LaserEquipment
+
+
+class LaserVest
 {
     public:
-        // Constructor and parent object initialization.
-        LaserVest(int playernum, int comPin, int sensorPin) : LaserEquipment(playernum, comPin),
-        m_irrecv(sensorPin)
+        // Constructor
+        LaserVest(int playernum, int team, int compin, int sensorpin):
+        m_playernum(playernum),
+        m_compin(compin),
+        m_sensorpin(sensorpin),
+        m_team(team),
+        m_irrecv(m_sensorpin)
         {
-            digitalWrite(m_comPin, HIGH);
+            digitalWrite(m_compin, HIGH);
             m_upgrades = NONE;
             m_irrecv.enableIRIn();
         }
 
         // Receives a message over the registered sensorpin
-        uint32_t receive();
+        void receive();
 
     private:
 
@@ -29,8 +35,14 @@ class LaserVest : public LaserEquipment
 
         void applyStatus(uint16_t options);
 
-        int m_sensorPin;
+        int m_playernum;
+        int m_compin;
+        int m_sensorpin;
+
         uint16_t m_upgrades;
+        uint16_t m_team;
+
+        decode_results m_res;
         IRrecv m_irrecv;
 };
 
