@@ -29,7 +29,7 @@ void LaserGun::trigger()
 
     if (m_debounce.currentState ==  m_debounce.previousState)
     {
-        if (m_debounce.pressed == LOW && m_debounce.currentState == LOW)
+        if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
         {
             if (!m_debounce.justPressed)
             {
@@ -52,12 +52,13 @@ void LaserGun::fire()
     if (canFire())
     {
         unsigned long msg = 0;
-        msg = (((unsigned long) m_team) << 16) | ((unsigned long) m_playernum);
-        Serial.println(msg, BIN);
-        Serial.println(sizeof(long));
+        msg = (((unsigned long) m_team) << 24) | (((unsigned long) m_playernum) << 16);
+        msg = (msg | checksum(msg));
+
+        Serial.println(msg, HEX);
+
         digitalWrite(m_laserpin, HIGH);
         m_irsend.sendSony(msg, nbits);
-
     }
     else
     {
@@ -73,4 +74,14 @@ void LaserGun::fire()
 bool LaserGun::canFire()
 {
     return true; //(digitalRead(m_comPin) == HIGH);
+}
+
+unsigned long checksum(unsigned long msg)
+{
+    unsigned long team = (msg >> 24);
+    unsigned long plnum = (msg & 0x00FF0000) >> 16;
+
+    unsigned long chksum = (team + plnum) % 255;
+
+    return chksum;
 }

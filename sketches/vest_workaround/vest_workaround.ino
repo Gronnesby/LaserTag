@@ -20,7 +20,7 @@ uint16_t team = TEAM_B;
 bool dead = false;
 
 long tod = 0;
-long death_time = 5000;
+long death_time = 1000;
 long led_timer = 0;
 
 void setup()
@@ -63,20 +63,30 @@ void decode_message()
     unsigned long val = 0;
     unsigned long plnum = 0;
     unsigned long t = 0;
+    unsigned long chk = 0;
 
     if (irrecv.decode(&results))
     {
         val = results.value;
-        t = (val >> 16);
-        plnum = (val & 0x0000FFFF);
-        if(t != team)
+        t = (val >> 24);
+        plnum = (val & 0x00FF0000) >> 16;
+        chk = (val & 0x000000FF);
+
+        if(chk != ((t + plnum) % 255))
         {
-            Serial.println("Shot by:");
-            Serial.println(plnum);
-            dead = true;
-            tod = millis();
-            led_timer = millis();
-            return;
+          Serial.println("Corrupted value");  
+        }
+        else
+        {
+          if(t != team)
+          {
+              Serial.println("Shot by:");
+              Serial.println(plnum);
+              dead = true;
+              tod = millis();
+              led_timer = millis();
+              return;
+          }
         }
         irrecv.resume(); // Receive the next value
     }

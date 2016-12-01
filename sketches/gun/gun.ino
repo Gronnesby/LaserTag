@@ -1,7 +1,7 @@
 
 #include <LaserGun.h>
 
-LaserGun gun(23, 1, 2, 3, 5);
+LaserGun gun(23, 9, 5, 3, 4);
 
 void setup()
 {

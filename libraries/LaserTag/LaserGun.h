@@ -39,8 +39,9 @@ class LaserGun
             m_debounce = buttonDebounce_t{};
 
             pinMode(m_triggerpin, INPUT);
-            pinMode(m_firepin, OUTPUT);
+            //pinMode(m_firepin, OUTPUT);
             pinMode(m_laserpin, OUTPUT);
+
         }
         // Trigger function with button debouncing
         void trigger();
@@ -65,11 +66,12 @@ class LaserGun
 
         buttonDebounce_t m_debounce;
 
-        uint16_t m_playernum;
-        uint16_t m_team;
+        uint8_t m_playernum;
+        uint8_t m_team;
         uint16_t m_upgrades;
         IRsend m_irsend;
 };
 
+unsigned long checksum(unsigned long msg);
 
 #endif
