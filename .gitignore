@@ -33,6 +33,7 @@
 #libraries/
 bin2header_0.0.1/
 .DS_Store/
+.DS_Store
 
 *.xcworkspace
 
