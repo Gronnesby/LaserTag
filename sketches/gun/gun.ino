@@ -1,15 +1,37 @@
 
 #include <LaserGun.h>
 
-LaserGun gun(23, 9, 5, 3, 4);
+int playernum = 23;
+int compin = 9;
+int trigger = 5;
+int fire = 3;
+int laser = 4;
+
+LaserGun gun(playernum, compin, trigger, fire, laser);
+
+int leds = 13;
 
 void setup()
 {
-  Serial.begin(9600);
+  pinMode(leds, OUTPUT);
+  digitalWrite(leds, HIGH);
 }
-
 
 void loop()
 {
-    gun.trigger();
+    if (gun.trigger())
+    {
+        blink_leds();
+    }
+}
+
+void blink_leds()
+{
+    digitalWrite(leds, LOW);
+    delay(20);
+    digitalWrite(leds, HIGH);
+    delay(20);
+    digitalWrite(leds, LOW);
+    delay(20);
+    digitalWrite(leds, HIGH);
 }

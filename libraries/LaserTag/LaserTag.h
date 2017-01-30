@@ -27,12 +27,6 @@ enum
     UPGRADES = 0x0080
 };
 
-enum SOUND : byte
-{
-    FIRE,
-    CLICK,
-    HIT
-};
 
 
 

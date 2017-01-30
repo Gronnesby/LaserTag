@@ -18,7 +18,7 @@ void LaserGun::triggerRelease()
  * This method should either directly call fire,
  * or trigger an interrupt that fire is attached to.
  */
-void LaserGun::trigger()
+bool LaserGun::trigger()
 {
     if ((m_debounce.lastTime + c_debounceTime) > millis())
     {
@@ -27,6 +27,7 @@ void LaserGun::trigger()
     m_debounce.lastTime = millis();
     m_debounce.currentState = digitalRead(m_triggerpin);
 
+    bool f = false;
     if (m_debounce.currentState ==  m_debounce.previousState)
     {
         if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
@@ -34,12 +35,13 @@ void LaserGun::trigger()
             if (!m_debounce.justPressed)
             {
                 m_debounce.justPressed = 1;
-                fire();
+                f = fire();
             }
         }
         m_debounce.pressed = !m_debounce.currentState;
     }
     m_debounce.previousState = m_debounce.currentState;
+    return f;
 }
 
 
@@ -47,8 +49,9 @@ void LaserGun::trigger()
  * Trigger should either call this to fire,
  * or this could be an event handler invoked by an interrupt.
  */
-void LaserGun::fire()
+bool LaserGun::fire()
 {
+    bool f = false;
     if (canFire())
     {
         unsigned long msg = 0;
@@ -59,6 +62,7 @@ void LaserGun::fire()
 
         digitalWrite(m_laserpin, HIGH);
         m_irsend.sendSony(msg, nbits);
+        f = true;
     }
     else
     {
@@ -66,6 +70,7 @@ void LaserGun::fire()
     }
 
     triggerRelease();
+    return f;
 }
 
 /* Communicates with the vest and checks wether

@@ -44,12 +44,12 @@ class LaserGun
 
         }
         // Trigger function with button debouncing
-        void trigger();
+        bool trigger();
 
     private:
 
         // Fire function for sending an IR signal
-        void fire();
+        bool fire();
 
         // Communication with the vest to check if we can fire
         bool canFire();
