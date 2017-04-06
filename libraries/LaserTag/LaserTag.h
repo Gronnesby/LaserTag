@@ -16,14 +16,13 @@ const uint32_t PLAYER_MASK = 0x0000FFFF;
 
 enum
 {
-    NONE = 0x0,
+    COMMAND = 0x0,
     TEAM_A = 0x01,
     TEAM_B = 0x02,
     UPGRADE_RAPID = 0x0004,
     UPGRADE_INVULN = 0x0008,
     UPGRADE_INVIS = 0x0010,
     UPGRADE_SPY = 0x0020,
-    GAME_RESET = 0x0040,
     UPGRADES = 0x0080
 };
 

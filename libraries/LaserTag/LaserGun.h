@@ -22,29 +22,75 @@ struct buttonDebounce
 };
 typedef struct buttonDebounce buttonDebounce_t;
 
+struct laser_gun
+{
+    int trigger;
+    int fire;
+    int laser;
+    int vest_com;
+
+    uint8_t player_num;
+    uint8_t team;
+    buttonDebounce_t bd;
+
+    IRrecv recv;
+    IRsend send;
+    decode_results results;
+};
+typedef struct laser_gun laser_gun_t;
+
+/// Trigger function with button debouncing.
+/**
+ *
+ * 
+ */
+//bool trigger(laser_gun_t& l);
+
+// Fire function for sending an IR signal
+//bool fire(laser_gun_t& l);
+
+// Communication with the vest to check if we can fire
+//bool canFire(laser_gun_t& l);
+
+// Release the trigger
+//void triggerRelease(laser_gun_t& l);
+
+// Create an 8-bit checksum based on a 32-bit message
+unsigned long checksum(unsigned long msg);
+
 class LaserGun
 {
     public:
-        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin) :
+        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin, int irpin) :
         m_playernum(playernum),
         m_triggerpin(triggerpin),
         m_firepin(firepin),
         m_compin(compin),
         m_laserpin(laserpin),
-        m_irsend(IRsend())
+        m_irsend(IRsend()),
+        irrecv(IRrecv(irpin))
         {
-            m_upgrades = NONE;
+            m_upgrades = 0x0;
             m_team = TEAM_A;
 
             m_debounce = buttonDebounce_t{};
-
+            results = decode_results{};
+            
             pinMode(m_triggerpin, INPUT);
-            //pinMode(m_firepin, OUTPUT);
+            pinMode(m_compin, INPUT);
             pinMode(m_laserpin, OUTPUT);
 
         }
+
         // Trigger function with button debouncing
         bool trigger();
+
+        // Receive from the gun IR sensor
+        // Used for upgrades, commands and point-counting
+        static void recv_ir_signal();
+
+        decode_results results;
+        IRrecv irrecv;
 
     private:
 
@@ -72,6 +118,6 @@ class LaserGun
         IRsend m_irsend;
 };
 
-unsigned long checksum(unsigned long msg);
+
 
 #endif

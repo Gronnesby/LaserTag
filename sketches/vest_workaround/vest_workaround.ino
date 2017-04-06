@@ -8,43 +8,82 @@
 
 #include <IRremote.h>
 #include <LaserTag.h>
+#include <Adafruit_NeoPixel.h>
 
 int RECV_PIN = 5;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
-int ledpin = 7;
+int toGunPin = 9;
+int ledpin = 13;
 int ledstate = HIGH;
 
 uint16_t team = TEAM_B;
 bool dead = false;
 
 long tod = 0;
-long death_time = 1000;
+long death_time = 6000;
 long led_timer = 0;
+
+int npixels = 20;
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(npixels, 6, NEO_RGB + NEO_KHZ800);
 
 void setup()
 {
     Serial.begin(9600);
     irrecv.enableIRIn(); // Start the receiver
+
     pinMode(7, OUTPUT);
+    pinMode(ledpin, OUTPUT);
+    pinMode(toGunPin, OUTPUT);
     digitalWrite(ledpin, ledstate);
+    digitalWrite(toGunPin, HIGH);
+
+    strip.begin();
+    for(int i = 0; i < npixels; i++)
+    {
+        if (team == TEAM_B)
+        {
+            strip.setPixelColor(i, 0, 255, 0);
+        }
+        else
+        {
+            strip.setPixelColor(i, 0, 0, 255);
+        }
+        
+    }
+    strip.show();
+
 }
 
 void loop() {
 
     if(!dead)
     {
+        digitalWrite(toGunPin, HIGH);
         decode_message();
     }
     else
     {
+        digitalWrite(toGunPin, LOW);
         if ((tod > 0) && ((millis() - tod) > death_time))
         {
             dead = false;
             tod = 0;
             ledstate = HIGH ;
             digitalWrite(ledpin, ledstate);
+            for(int i = 0; i < npixels; i++)
+            {
+                if (team == TEAM_B)
+                {
+                    strip.setPixelColor(i, 0, 255, 0);
+                }
+                else
+                {
+                    strip.setPixelColor(i, 0, 0, 255);
+                }
+            }
+            strip.show();
             irrecv.resume();
         }
         else
@@ -55,7 +94,6 @@ void loop() {
 
     delay(10);
 
-  // vest.receive();
 }
 
 void decode_message()
@@ -78,7 +116,7 @@ void decode_message()
         }
         else
         {
-          if(t != team)
+          if(t != team && t != COMMAND)
           {
               Serial.println("Shot by:");
               Serial.println(plnum);
@@ -86,6 +124,14 @@ void decode_message()
               tod = millis();
               led_timer = millis();
               return;
+          }
+          else if (t == COMMAND)
+          {
+
+          }
+          else if (t == team)
+          {
+              
           }
         }
         irrecv.resume(); // Receive the next value
@@ -100,13 +146,29 @@ void blink_led()
         led_timer = millis();
         if (ledstate == HIGH)
         {
+            for(int i = 0; i < npixels; i++)
+            {
+                strip.setPixelColor(i, 255, 0, 0);
+            }
             ledstate = LOW;
+            //digitalWrite(ledpin, ledstate);
         }
         else
         {
+            for(int i = 0; i < npixels; i++)
+            {
+                if (team == TEAM_B)
+                {
+                    strip.setPixelColor(i, 0, 255, 0);
+                }
+                else
+                {
+                    strip.setPixelColor(i, 0, 0, 255);
+                }
+            }
             ledstate = HIGH;
+            //digitalWrite(ledpin, ledstate);
         }
-
-        digitalWrite(ledpin, ledstate);
+        strip.show();
     }
 }

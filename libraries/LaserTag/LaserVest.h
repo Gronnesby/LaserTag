@@ -18,7 +18,7 @@ class LaserVest
         m_irrecv(m_sensorpin)
         {
             digitalWrite(m_compin, HIGH);
-            m_upgrades = NONE;
+            m_upgrades = 0x0;
             m_irrecv.enableIRIn();
         }
 
