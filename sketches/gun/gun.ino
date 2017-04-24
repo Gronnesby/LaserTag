@@ -1,6 +1,5 @@
 
 #include <LaserGun.h>
-#include <avr/pgmspace.h>
 
 int playernum = 23;
 int compin = 9;
@@ -10,33 +9,30 @@ int laser = 4;
 
 int interrupt = 2;
 int trigger_moment = -1;
+int ir_sensor_time = 50;
+unsigned long recv_val = 0;
 
-LaserGun gun(playernum, compin, trigger, fire, laser, interrupt);
+int sw = LOW;
 
 int leds = 13;
-int speaker = A0;
 
-int ir_sensor_time = 30;
-volatile int recv_val = -1;
-
-const int audio_length = 4135;
+LaserGun gun(playernum, compin, trigger, fire, laser, interrupt);
 
 void setup()
 {
     Serial.begin(9600);
     pinMode(leds, OUTPUT);
-    pinMode(speaker, OUTPUT);
     pinMode(interrupt, INPUT_PULLUP);
 
     digitalWrite(leds, HIGH);
-    attachInterrupt(digitalPinToInterrupt(interrupt), recv_ir_signal, CHANGE);
+    //attachInterrupt(digitalPinToInterrupt(interrupt), gun.recvIRSignal, CHANGE);
 }
 
 void loop()
 {
     if (gun.trigger())
     {
-        play_sound();
+        digitalWrite(compin, !sw);
         trigger_moment = millis();
     }
     while ((trigger_moment != -1) && ((millis() - trigger_moment) < ir_sensor_time))
@@ -66,20 +62,10 @@ void process_ir_input()
 void play_sound()
 {
 
-    for (int i = 0; i < 2048; i++)
-    {
-        analogWrite(speaker, i*millis() % 255);
-    }
 }
 
 
 void recv_ir_signal()
 {
-    recv_val = -1;
-    if (gun.irrecv.decode(&gun.results))
-    {
-        recv_val = gun.results.value;
-        gun.irrecv.resume(); // Receive the next value
-    }
-
+    
 }

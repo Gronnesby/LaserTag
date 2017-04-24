@@ -1,16 +1,41 @@
 
 #include <LaserVest.h>
+#include <Adafruit_NeoPixel.h>
 
-// LaserVest object, Args: int playernum, int compin, long graceperiod, int sensorpin
-LaserVest vest(23, TEAM_B, 1, 5);
+
+int ledpin = 13;
+int ledstate = HIGH;
+
+IRrecv ir = IRrecv(9);
+decode_results res;
+
+//Adafruit_NeoPixel strip = Adafruit_NeoPixel(20, STRIPPIN, NEO_GRB + NEO_KHZ800);
+LaserVest vest = LaserVest(23, TEAM_B, 10, 9, ir, res);
 
 void setup(void)
 {
     Serial.begin(9600);
+
+    pinMode(ledpin, OUTPUT);
+    digitalWrite(ledpin, ledstate);
+    
+    Serial.println("Setup");
 }
 
 
 void loop(void)
 {
-  vest.receive();
+    if (vest.alive)
+    {
+        vest.enableWeapon();
+        if (ir.decode(&res))
+        {
+            unsigned long val = res.value;
+            vest.decodeMessage(val);
+        }
+    }
+    else
+    {
+        vest.lockout();
+    }
 }

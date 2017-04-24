@@ -58,6 +58,7 @@ bool LaserGun::fire()
 
         digitalWrite(m_laserpin, HIGH);
         m_irsend.sendSony(msg, nbits);
+        Serial.println(msg, HEX);
         f = true;
     }
     else
@@ -69,6 +70,16 @@ bool LaserGun::fire()
     return f;
 }
 
+void LaserGun::playSound(int sound)
+{
+
+}
+
+void LaserGun::recvIRSignal()
+{
+    
+}
+
 /* Communicates with the vest and checks wether
  * the gun can fire or not.
  */
@@ -76,18 +87,6 @@ bool LaserGun::canFire()
 {
     return (digitalRead(m_compin) == HIGH);
 }
-
-unsigned long checksum(unsigned long msg)
-{
-    unsigned long team = (msg >> 24);
-    unsigned long plnum = (msg & 0x00FF0000) >> 16;
-
-    unsigned long chksum = (team + plnum) % 255;
-
-    return chksum;
-}
-
-
 
 
 // bool trigger(laser_gun_t& l)

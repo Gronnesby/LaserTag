@@ -8,7 +8,6 @@
 const long c_debounceTime = 10;
 const int nbits = sizeof(unsigned long) * 8;
 
-
 struct buttonDebounce
 {
     byte previousState;
@@ -70,7 +69,6 @@ class LaserGun
         m_irsend(IRsend()),
         irrecv(IRrecv(irpin))
         {
-            m_upgrades = 0x0;
             m_team = TEAM_A;
 
             m_debounce = buttonDebounce_t{};
@@ -87,7 +85,10 @@ class LaserGun
 
         // Receive from the gun IR sensor
         // Used for upgrades, commands and point-counting
-        static void recv_ir_signal();
+        void recvIRSignal();
+
+        // Received value from the IR sensor
+        volatile int recvVal;
 
         decode_results results;
         IRrecv irrecv;
@@ -103,7 +104,8 @@ class LaserGun
         // Release the trigger
         void triggerRelease();
 
-        uint16_t getUpgrades();
+        // Play gun sound
+        void playSound(int sound);
 
         int m_triggerpin;
         int m_firepin;

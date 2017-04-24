@@ -10,6 +10,7 @@
 #endif
 
 #include <IRremote.h>
+#include <Adafruit_NeoPixel.h>
 
 const uint32_t STATUS_MASK = 0xFFFF0000;
 const uint32_t PLAYER_MASK = 0x0000FFFF;
@@ -26,7 +27,7 @@ enum
     UPGRADES = 0x0080
 };
 
-
+unsigned long checksum(unsigned long msg);
 
 
 #endif

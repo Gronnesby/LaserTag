@@ -5,33 +5,12 @@
 /* LASER TAG VEST IMPLEMENTATION
  */
 
- void LaserVest::receive()
-{
-
-      unsigned long val = 0;
-      unsigned long plnum = 0;
-      unsigned long upgrd = 0;
-
-      if (m_irrecv.decode(&m_res)) {
-        val = m_res.value;
-        Serial.println(val, BIN);
-        upgrd = (val >> 16);
-        plnum = (val & 0x0000FFFF);
-        Serial.println(upgrd, DEC);
-        Serial.println(plnum, DEC);
-        m_irrecv.resume(); // Receive the next value
-      }
-      delay(10);
-}
 
 /* Disable the weapon by writing LOW to the communcation pin.
  */
 void LaserVest::disableWeapon()
 {
     digitalWrite(m_compin, LOW);
-
-    // Should probably set up a enable weapon timed interrupt here
-    // Or at least count down in the receive method
 }
 
 
@@ -43,28 +22,90 @@ void LaserVest::enableWeapon()
 }
 
 
-void LaserVest::applyStatus(uint16_t options)
+void LaserVest::decodeMessage(unsigned long val)
 {
+    unsigned long plnum = 0;
+    unsigned long t = 0;
+    unsigned long chk = 0;
 
-    if (((options & TEAM_A) != m_team) || ((options & TEAM_B) != m_team))
-    {
-        // Got shot by the other team, do something here
-        disableWeapon();
-    }
-    else if (((options & TEAM_A) == m_team) || ((options & TEAM_B)== m_team))
-    {
-        // Friendly fire
-    }
+    t = (val >> 24);
+    plnum = (val & 0x00FF0000) >> 16;
+    chk = (val & 0x000000FF);
 
-    if (options & UPGRADES)
+    if(chk != checksum(val))
     {
-        if (!(m_upgrades & UPGRADES))
+        Serial.println("Corrupted value");
+        Serial.println(val, HEX);
+        // Ignore corrupted values
+        m_irrecv.resume();
+        return;
+    }
+    else
+    {
+        if(t != m_team && t != COMMAND)
         {
-            m_upgrades |= (options & UPGRADE_RAPID);
-            m_upgrades |= (options & UPGRADE_INVULN);
-            m_upgrades |= (options & UPGRADE_INVIS);
-            m_upgrades |= (options & UPGRADE_SPY);
+            Serial.println("Hit");
+            alive = false;
+            m_tod = millis();
+            m_ledTimer = millis();
+            return;
         }
+        else if (t == COMMAND)
+        {
+            unsigned int target = (val & 0x0000FF00) >> 8;
+            if (target == m_playernum)
+            {
+                m_score++;
+            }
+        }
+        m_irrecv.resume();
     }
+}
 
+void LaserVest::lockout()
+{
+    disableWeapon();
+    if ((m_tod > 0) && ((millis() - m_tod) > lockoutMillis))
+    {
+        alive = true;
+        m_tod = 0;
+        m_ledState = HIGH;
+        
+        for(int i = 0; i < m_strip.numPixels(); i++)
+        {
+            m_strip.setPixelColor(i, m_teamColor);
+        }
+        m_strip.show();
+        m_irrecv.resume();
+    }
+    else
+    {
+        blinkLeds();
+    }
+}
+
+
+void LaserVest::blinkLeds()
+{
+    if((millis() - m_ledTimer) >= 300)
+    {
+        m_ledTimer = millis();
+        if (m_ledState == HIGH)
+        {
+            for(int i = 0; i < m_strip.numPixels(); i++)
+            {
+                m_strip.setPixelColor(i, 255, 0, 0);
+            }
+            m_ledState = LOW;
+        }
+        else
+        {
+            for(int i = 0; i < m_strip.numPixels(); i++)
+            {
+                m_strip.setPixelColor(i, m_teamColor);
+            }
+            m_ledState = HIGH;
+        }
+        m_strip.show();
+    }
 }

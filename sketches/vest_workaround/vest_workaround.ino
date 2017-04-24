@@ -1,20 +1,14 @@
-/*
- * IRremote: IRrecvDemo - demonstrates receiving IR codes with IRrecv
- * An IR detector/demodulator must be connected to the input RECV_PIN.
- * Version 0.1 July, 2009
- * Copyright 2009 Ken Shirriff
- * http://arcfn.com
- */
+
 
 #include <IRremote.h>
 #include <LaserTag.h>
 #include <Adafruit_NeoPixel.h>
 
-int RECV_PIN = 5;
+int RECV_PIN = 9;
 IRrecv irrecv(RECV_PIN);
 decode_results results;
 
-int toGunPin = 9;
+int toGunPin = 10;
 int ledpin = 13;
 int ledstate = HIGH;
 
@@ -26,14 +20,13 @@ long death_time = 6000;
 long led_timer = 0;
 
 int npixels = 20;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(npixels, 6, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(npixels, 12, NEO_RGB + NEO_KHZ800);
 
 void setup()
 {
     Serial.begin(9600);
     irrecv.enableIRIn(); // Start the receiver
 
-    pinMode(7, OUTPUT);
     pinMode(ledpin, OUTPUT);
     pinMode(toGunPin, OUTPUT);
     digitalWrite(ledpin, ledstate);
