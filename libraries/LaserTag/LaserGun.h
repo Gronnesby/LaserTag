@@ -60,16 +60,16 @@ unsigned long checksum(unsigned long msg);
 class LaserGun
 {
     public:
-        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin, int irpin) :
+        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin, int sendpin) :
         m_playernum(playernum),
         m_triggerpin(triggerpin),
         m_firepin(firepin),
         m_compin(compin),
         m_laserpin(laserpin),
-        m_irsend(IRsend()),
-        irrecv(IRrecv(irpin))
+        m_sendpin(sendpin),
+        m_irsend(IRsend())
         {
-            m_team = TEAM_A;
+            m_team = TEAM_B;
 
             m_debounce = buttonDebounce_t{};
             results = decode_results{};
@@ -111,6 +111,7 @@ class LaserGun
         int m_firepin;
         int m_compin;
         int m_laserpin;
+        int m_sendpin;
 
         buttonDebounce_t m_debounce;
 

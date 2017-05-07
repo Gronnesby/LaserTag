@@ -50,7 +50,7 @@ bool LaserGun::trigger()
 bool LaserGun::fire()
 {
     bool f = false;
-    if (canFire())
+    if (1)
     {
         unsigned long msg = 0;
         msg = (((unsigned long) m_team) << 24) | (((unsigned long) m_playernum) << 16);
@@ -58,7 +58,6 @@ bool LaserGun::fire()
 
         digitalWrite(m_laserpin, HIGH);
         m_irsend.sendSony(msg, nbits);
-        Serial.println(msg, HEX);
         f = true;
     }
     else
@@ -75,10 +74,6 @@ void LaserGun::playSound(int sound)
 
 }
 
-void LaserGun::recvIRSignal()
-{
-    
-}
 
 /* Communicates with the vest and checks wether
  * the gun can fire or not.

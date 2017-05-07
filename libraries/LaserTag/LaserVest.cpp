@@ -34,17 +34,13 @@ void LaserVest::decodeMessage(unsigned long val)
 
     if(chk != checksum(val))
     {
-        Serial.println("Corrupted value");
-        Serial.println(val, HEX);
         // Ignore corrupted values
-        m_irrecv.resume();
         return;
     }
     else
     {
         if(t != m_team && t != COMMAND)
         {
-            Serial.println("Hit");
             alive = false;
             m_tod = millis();
             m_ledTimer = millis();
@@ -58,7 +54,6 @@ void LaserVest::decodeMessage(unsigned long val)
                 m_score++;
             }
         }
-        m_irrecv.resume();
     }
 }
 
@@ -71,12 +66,6 @@ void LaserVest::lockout()
         m_tod = 0;
         m_ledState = HIGH;
         
-        for(int i = 0; i < m_strip.numPixels(); i++)
-        {
-            m_strip.setPixelColor(i, m_teamColor);
-        }
-        m_strip.show();
-        m_irrecv.resume();
     }
     else
     {
@@ -92,20 +81,11 @@ void LaserVest::blinkLeds()
         m_ledTimer = millis();
         if (m_ledState == HIGH)
         {
-            for(int i = 0; i < m_strip.numPixels(); i++)
-            {
-                m_strip.setPixelColor(i, 255, 0, 0);
-            }
             m_ledState = LOW;
         }
         else
         {
-            for(int i = 0; i < m_strip.numPixels(); i++)
-            {
-                m_strip.setPixelColor(i, m_teamColor);
-            }
             m_ledState = HIGH;
         }
-        m_strip.show();
     }
 }

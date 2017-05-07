@@ -1,38 +1,38 @@
 
 #include <LaserGun.h>
 
-int playernum = 23;
+int PLAYER_NUMBER = 23;
 int compin = 9;
 int trigger = 5;
 int fire = 3;
 int laser = 4;
+int sendpin = 6;
 
-int interrupt = 2;
 int trigger_moment = -1;
-int ir_sensor_time = 50;
-unsigned long recv_val = 0;
+int ir_sensor_time = 30;
 
-int sw = LOW;
 
+int score = 0;
+
+IRrecv ir = IRrecv(9);
+decode_results res;
+
+bool sw = false;
 int leds = 13;
 
-LaserGun gun(playernum, compin, trigger, fire, laser, interrupt);
+LaserGun gun(PLAYER_NUMBER, compin, trigger, fire, laser, sendpin);
 
 void setup()
 {
     Serial.begin(9600);
     pinMode(leds, OUTPUT);
-    pinMode(interrupt, INPUT_PULLUP);
-
     digitalWrite(leds, HIGH);
-    //attachInterrupt(digitalPinToInterrupt(interrupt), gun.recvIRSignal, CHANGE);
 }
 
 void loop()
 {
     if (gun.trigger())
     {
-        digitalWrite(compin, !sw);
         trigger_moment = millis();
     }
     while ((trigger_moment != -1) && ((millis() - trigger_moment) < ir_sensor_time))
@@ -45,27 +45,30 @@ void loop()
 
 void process_ir_input()
 {
-    if (recv_val != -1)
+    if (ir.decode(&res))
     {
+        unsigned int recv_val = res.value;
+        Serial.println(recv_val);
         uint8_t t = (recv_val >> 24);
         uint8_t plnum = (recv_val & 0x00FF0000) >> 16;
+        uint8_t num = (recv_val & 0x0000FF00) >> 8;
         uint8_t chk = (recv_val & 0x000000FF);
-        Serial.println(recv_val, HEX);
-        recv_val = -1;
-    }
-    else
-    {
-        Serial.println("Corrupted Value");
+        
+        if (checksum(recv_val) == chk)
+        {
+            if (t == COMMAND)
+            {
+                if (num == PLAYER_NUMBER)
+                {
+                    score++;
+                    Serial.println(score);
+                }
+            }
+        }
     }
 }
 
 void play_sound()
 {
 
-}
-
-
-void recv_ir_signal()
-{
-    
 }

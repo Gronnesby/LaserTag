@@ -1,0 +1,142 @@
+[
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino"
+  },
+  {
+    "Sourcefile": "",
+    "Include": "",
+    "Includepath": "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/standard"
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/gun/sketch/gun.ino.cpp",
+    "Include": "LaserGun.h",
+    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag"
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/gun/sketch/gun.ino.cpp",
+    "Include": "IRremote.h",
+    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote"
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/gun/sketch/gun.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserGun.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserTag.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserVest.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/IRremote.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/irPronto.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/irRecv.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/irSend.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Aiwa.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Denon.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Dish.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_JVC.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_LG.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Lego_PF.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Mitsubishi.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_NEC.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Panasonic.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_RC5_RC6.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Samsung.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Sanyo.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Sharp.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Sony.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Template.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Whynter.cpp",
+    "Include": "",
+    "Includepath": ""
+  }
+]

@@ -1,16 +1,9 @@
 #ifndef __LASER_TAG_H__
 #define __LASER_TAG_H__
 
-#if ARDUINO >= 100
-    #include "Arduino.h"
-#else
-    #include "WProgram.h"
-    #include "pins_arduino.h"
-    #include "WConstants.h"
-#endif
 
+#include "Arduino.h"
 #include <IRremote.h>
-#include <Adafruit_NeoPixel.h>
 
 const uint32_t STATUS_MASK = 0xFFFF0000;
 const uint32_t PLAYER_MASK = 0x0000FFFF;

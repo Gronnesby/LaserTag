@@ -1,25 +1,24 @@
 
 #include <LaserVest.h>
-#include <Adafruit_NeoPixel.h>
 
+#define NUMLEDS 17
 
 int ledpin = 13;
 int ledstate = HIGH;
+int team = TEAM_A;
 
 IRrecv ir = IRrecv(9);
 decode_results res;
 
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(20, STRIPPIN, NEO_GRB + NEO_KHZ800);
-LaserVest vest = LaserVest(23, TEAM_B, 10, 9, ir, res);
+LaserVest vest = LaserVest(23, team, 10);
 
 void setup(void)
 {
-    Serial.begin(9600);
-
+    ir.enableIRIn();
     pinMode(ledpin, OUTPUT);
     digitalWrite(ledpin, ledstate);
-    
-    Serial.println("Setup");
+   
+    delay(10);
 }
 
 
@@ -32,10 +31,18 @@ void loop(void)
         {
             unsigned long val = res.value;
             vest.decodeMessage(val);
+            ir.resume();
         }
     }
     else
     {
         vest.lockout();
     }
+    delay(10);
+}
+
+
+void decode_ir_msg(unsigned long val)
+{
+    
 }
