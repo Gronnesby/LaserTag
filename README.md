@@ -1,4 +1,4 @@
-# Arduino Laser Tag Library
+# Arduino Laser Tag
 Library and sketch code for an Arduino-based Laser Tag game.
 
 The code is part of a cooperation project between [Kodeklubben Tromsø](https://kodeklubben-tromso.github.io/) (Tromsø Code Club) and [Nordnorsk Vitensenter](https://nordnorsk.vitensenter.no/) (Northern Norwegian Science Museum) called *Skills Makerlab.* The *Makerlab* is a free evening activity for kids between 13-19 years.
