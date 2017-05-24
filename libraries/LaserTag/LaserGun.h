@@ -8,6 +8,7 @@
 const long c_debounceTime = 10;
 const int nbits = sizeof(unsigned long) * 8;
 
+// Button debounce variables
 struct buttonDebounce
 {
     byte previousState;
@@ -21,14 +22,15 @@ struct buttonDebounce
 };
 typedef struct buttonDebounce buttonDebounce_t;
 
+// Laser gun variables & constants
 struct laser_gun
 {
-    int trigger;
-    int fire;
-    int laser;
-    int vest_com;
+    const int trigger;
+    const int fire;
+    const int laser;
+    const int vest_com;
 
-    uint8_t player_num;
+    const uint8_t player_num;
     uint8_t team;
     buttonDebounce_t bd;
 
@@ -38,89 +40,19 @@ struct laser_gun
 };
 typedef struct laser_gun laser_gun_t;
 
-/// Trigger function with button debouncing.
-/**
- *
- * 
- */
-//bool trigger(laser_gun_t& l);
+// Trigger function with button debouncing.
+bool trigger(laser_gun_t& l);
 
 // Fire function for sending an IR signal
-//bool fire(laser_gun_t& l);
+bool fire(laser_gun_t& l);
 
 // Communication with the vest to check if we can fire
-//bool canFire(laser_gun_t& l);
+bool canFire(laser_gun_t& l);
 
 // Release the trigger
-//void triggerRelease(laser_gun_t& l);
+void triggerRelease(laser_gun_t& l);
 
 // Create an 8-bit checksum based on a 32-bit message
 unsigned long checksum(unsigned long msg);
-
-class LaserGun
-{
-    public:
-        LaserGun(int playernum, int compin, int triggerpin, int firepin, int laserpin, int sendpin) :
-        m_playernum(playernum),
-        m_triggerpin(triggerpin),
-        m_firepin(firepin),
-        m_compin(compin),
-        m_laserpin(laserpin),
-        m_sendpin(sendpin),
-        m_irsend(IRsend())
-        {
-            m_team = TEAM_B;
-
-            m_debounce = buttonDebounce_t{};
-            results = decode_results{};
-            
-            pinMode(m_triggerpin, INPUT);
-            pinMode(m_compin, INPUT);
-            pinMode(m_laserpin, OUTPUT);
-
-        }
-
-        // Trigger function with button debouncing
-        bool trigger();
-
-        // Receive from the gun IR sensor
-        // Used for upgrades, commands and point-counting
-        void recvIRSignal();
-
-        // Received value from the IR sensor
-        volatile int recvVal;
-
-        decode_results results;
-        IRrecv irrecv;
-
-    private:
-
-        // Fire function for sending an IR signal
-        bool fire();
-
-        // Communication with the vest to check if we can fire
-        bool canFire();
-
-        // Release the trigger
-        void triggerRelease();
-
-        // Play gun sound
-        void playSound(int sound);
-
-        int m_triggerpin;
-        int m_firepin;
-        int m_compin;
-        int m_laserpin;
-        int m_sendpin;
-
-        buttonDebounce_t m_debounce;
-
-        uint8_t m_playernum;
-        uint8_t m_team;
-        uint16_t m_upgrades;
-        IRsend m_irsend;
-};
-
-
 
 #endif

@@ -8,22 +8,32 @@
 
 /* Disable the weapon by writing LOW to the communcation pin.
  */
-void LaserVest::disableWeapon()
+void disableWeapon(laser_vest_t &v)
 {
-    digitalWrite(m_compin, LOW);
+    digitalWrite(v.to_gun, LOW);
 }
 
 
 /* Enable the weapon by writing HIGH to the communcation pin.
  */
-void LaserVest::enableWeapon()
+void enableWeapon(laser_vest_t &v)
 {
-    digitalWrite(m_compin, HIGH);
+    digitalWrite(v.to_gun, HIGH);
+}
+
+void sendSignal(laser_vest_t &v)
+{
+    unsigned long flash_msg = 0;
+    flash_msg = flash_msg | (((unsigned long) COMMAND) << 24) | (((unsigned long) v.player_num) << 16) | (((unsigned long) v.shot_by) << 8);
+    flash_msg = (flash_msg | checksum(flash_msg));
+
+    v.send.sendNEC(flash_msg, 32);
 }
 
 
-void LaserVest::decodeMessage(unsigned long val)
+void decodeMessage(laser_vest_t &v)
 {
+    unsigned long val = v.results.value;
     unsigned long plnum = 0;
     unsigned long t = 0;
     unsigned long chk = 0;
@@ -39,53 +49,52 @@ void LaserVest::decodeMessage(unsigned long val)
     }
     else
     {
-        if(t != m_team && t != COMMAND)
+        if(t != v.team && t != COMMAND)
         {
-            alive = false;
-            m_tod = millis();
-            m_ledTimer = millis();
+            v.alive = false;
+            v.tod = millis();
+            v.blink_timer = millis();
             return;
         }
         else if (t == COMMAND)
         {
             unsigned int target = (val & 0x0000FF00) >> 8;
-            if (target == m_playernum)
+            if (target == v.player_num)
             {
-                m_score++;
+                v.score++;
             }
         }
     }
 }
 
-void LaserVest::lockout()
-{
-    disableWeapon();
-    if ((m_tod > 0) && ((millis() - m_tod) > lockoutMillis))
-    {
-        alive = true;
-        m_tod = 0;
-        m_ledState = HIGH;
-        
-    }
-    else
-    {
-        blinkLeds();
-    }
-}
 
-
-void LaserVest::blinkLeds()
+void blinkLeds(laser_vest_t &v)
 {
-    if((millis() - m_ledTimer) >= 300)
+    if((millis() - v.blink_timer) >= 300)
     {
-        m_ledTimer = millis();
-        if (m_ledState == HIGH)
+        v.blink_timer = millis();
+
+        if (v.ledstate == HIGH)
         {
-            m_ledState = LOW;
+            setStripColor(v, 0xFF000000);
+            v.ledstate = LOW;
+            digitalWrite(v.white_leds, v.ledstate);
         }
         else
         {
-            m_ledState = HIGH;
+            setStripColor(v, v.teamcolor);
+            v.ledstate = HIGH;
+            digitalWrite(v.white_leds, v.ledstate);
         }
+        v.strip.show();
     }
+}
+
+void setStripColor(laser_vest_t &v, uint32_t col)
+{
+        for(int i = 0; i < v.npixels; i++)
+        {
+            v.strip.setPixelColor(i, col);
+        }
+        v.strip.show();
 }

@@ -4,60 +4,45 @@
 /* LASER TAG GUN IMPLEMENTATION
 */
 
-void LaserGun::triggerRelease()
+// Trigger with button debounce
+bool trigger(laser_gun_t& l)
 {
-    if (m_debounce.justPressed == 1)
-    {
-        m_debounce.justPressed = 0;
-        digitalWrite(m_laserpin, LOW);
-    }
-}
-
-
-/* Debounce method for the guns trigger.
- */
-bool LaserGun::trigger()
-{
-    if ((m_debounce.lastTime + c_debounceTime) > millis())
+    if ((l.bd.lastTime + c_debounceTime) > millis())
     {
         return;
     }
-    m_debounce.lastTime = millis();
-    m_debounce.currentState = digitalRead(m_triggerpin);
+    l.bd.lastTime = millis();
+    l.bd.currentState = digitalRead(l.trigger);
 
     bool f = false;
-    if (m_debounce.currentState ==  m_debounce.previousState)
+    if (l.bd.currentState ==  l.bd.previousState)
     {
-        if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
+        if (l.bd.pressed == HIGH && l.bd.currentState == HIGH)
         {
-            if (!m_debounce.justPressed)
+            if (!l.bd.justPressed)
             {
-                m_debounce.justPressed = 1;
-                f = fire();
+                l.bd.justPressed = 1;
+                f = fire(l);
             }
         }
-        m_debounce.pressed = !m_debounce.currentState;
+        l.bd.pressed = !l.bd.currentState;
     }
-    m_debounce.previousState = m_debounce.currentState;
+    l.bd.previousState = l.bd.currentState;
     return f;
 }
 
-
-/* Fire method for the gun.
- * Trigger should either call this to fire,
- * or this could be an event handler invoked by an interrupt.
- */
-bool LaserGun::fire()
+// Fire function for sending an IR signal
+bool fire(laser_gun_t& l)
 {
     bool f = false;
-    if (1)
+    if (canFire(l))
     {
         unsigned long msg = 0;
-        msg = (((unsigned long) m_team) << 24) | (((unsigned long) m_playernum) << 16);
+        msg = (((unsigned long) l.team) << 24) | (((unsigned long) l.player_num) << 16);
         msg = (msg | checksum(msg));
 
-        digitalWrite(m_laserpin, HIGH);
-        m_irsend.sendSony(msg, nbits);
+        digitalWrite(l.laser, HIGH);
+        l.send.sendNEC(msg, nbits);
         f = true;
     }
     else
@@ -65,57 +50,22 @@ bool LaserGun::fire()
         // Play click sound
     }
 
-    triggerRelease();
+    triggerRelease(l);
     return f;
 }
 
-void LaserGun::playSound(int sound)
+// Communication with the vest to check if we can fire
+bool canFire(laser_gun_t& l)
 {
-
+    return digitalRead(l.vest_com) == HIGH;
 }
 
-
-/* Communicates with the vest and checks wether
- * the gun can fire or not.
- */
-bool LaserGun::canFire()
+// Release the trigger
+void triggerRelease(laser_gun_t& l)
 {
-    return (digitalRead(m_compin) == HIGH);
+    if (l.bd.justPressed == 1)
+    {
+        l.bd.justPressed = 0;
+        digitalWrite(l.laser, LOW);
+    }
 }
-
-
-// bool trigger(laser_gun_t& l)
-// {
-//     buttonDebounce_t m_debounce = l->bd;
-//     if ((m_debounce.lastTime + c_debounceTime) > millis())
-//     {
-//         return;
-//     }
-//     m_debounce.lastTime = millis();
-//     m_debounce.currentState = digitalRead(m_triggerpin);
-
-//     bool f = false;
-//     if (m_debounce.currentState ==  m_debounce.previousState)
-//     {
-//         if (m_debounce.pressed == HIGH && m_debounce.currentState == HIGH)
-//         {
-//             if (!m_debounce.justPressed)
-//             {
-//                 m_debounce.justPressed = 1;
-//                 f = fire();
-//             }
-//         }
-//         m_debounce.pressed = !m_debounce.currentState;
-//     }
-//     m_debounce.previousState = m_debounce.currentState;
-//     return f;
-// }
-
-// // Fire function for sending an IR signal
-// bool fire(laser_gun_t& l);
-
-// // Communication with the vest to check if we can fire
-// bool canFire(laser_gun_t& l);
-
-// // Release the trigger
-// void triggerRelease(laser_gun_t& l);

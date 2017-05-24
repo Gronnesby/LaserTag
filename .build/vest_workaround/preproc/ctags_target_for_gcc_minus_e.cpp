@@ -1,195 +1,171 @@
 # 1 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino"
 # 1 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino"
 
-
+# 3 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino" 2
 # 4 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino" 2
 # 5 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino" 2
 # 6 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino" 2
-# 7 "/Users/gronnesby/Documents/arduino/sketches/vest_workaround/vest_workaround.ino" 2
 
 
 
-int SERIAL_RX = 5;
-int SERIAL_TX = 6;
-int PLAYER_NUMBER = 23;
 
-int RECV_PIN = 9;
-IRrecv irrecv(RECV_PIN);
-IRsend irsend();
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(17, 12, ((0 << 6) | (0 << 4) | (1 << 2) | (2)) + 0x0000 /* 800 KHz datastream*/);
+SoftwareSerial ser(5, 6);
+int8_t sendbuf[8] = {0};
+IRrecv irrecv = IRrecv(9);
+IRsend irsend = IRsend();
 decode_results results;
 
-int toGunPin = 10;
-int fromGunPin = 11;
-int gunsound = 0x1;
-int ledpin = 13;
-int ledstate = 0x1;
+laser_vest_t vest
+{
+    10, // To gun pin
+    11, // From gun pin
+    13, // White led pin (white leds on the sensor plates)
+    0x1, // Ledstate
 
-uint16_t team = TEAM_B;
-uint32_t teamcolor;
-bool alive = true;
-int flashback = 0;
+    3, // Player num
+    TEAM_B, // Team
+    0x0, // Teamcolor
 
-long tod = 0;
-long death_time = 6000;
-long led_timer = 0;
+    true, // Alive or not
+    0, // Time of death
+    0,
+    6000, // Lockout time
+    300000, // Game time
+    0, // Blink timer
+    0, // Score
 
-int npixels = 17;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(npixels, 12, ((0 << 6) | (0 << 4) | (1 << 2) | (2)) + 0x0000 /* 800 KHz datastream*/);
-SoftwareSerial ser(SERIAL_RX, SERIAL_TX);
-int8_t sendbuf[8] = {0};
+    12, // Pixel data pin
+    17, // Num pixels
+    strip, // Pixel strip object
+
+    ser, // Serial object
+    sendbuf, // Sendbuffer
+
+    irrecv, // Ir receive object
+    irsend, // Ir send object
+    decode_results{} // Ir results
+};
+
 
 void setup()
 {
-    ser.begin(9600);
-    irrecv.enableIRIn(); // Start the receiver
+    vest.recv.enableIRIn();
 
-    pinMode(ledpin, 0x1);
-    pinMode(toGunPin, 0x1);
-    pinMode(fromGunPin, 0x0);
-    digitalWrite(ledpin, ledstate);
-    digitalWrite(toGunPin, 0x1);
 
-    strip.begin();
+    pinMode(vest.ledpin, 0x1);
+    pinMode(vest.to_gun, 0x1);
+    pinMode(vest.from_gun, 0x0);
+    digitalWrite(vest.ledpin, ledstate);
+    digitalWrite(vest.to_gun, 0x1);
 
-    if (team == TEAM_B)
+    vest.strip.begin();
+    vest.teamcolor = (vest.team == TEAM_A) ? vest.strip.Color(0, 0, 255) : vest.strip.color(0, 255, 0);
+
+    for(int i = 0; i < vest.npixels; i++)
     {
-        teamcolor = strip.Color(0, 255, 0);
+        vest.strip.setPixelColor(i, vest.teamcolor);
     }
-    else
-    {
-        teamcolor = strip.Color(0, 0, 255);
-    }
-
-    for(int i = 0; i < npixels; i++)
-    {
-        strip.setPixelColor(i, teamcolor);
-    }
-    strip.show();
+    vest.strip.show();
 }
 
 void loop() {
 
-    if(alive)
+
+    if(vest.alive)
     {
-        digitalWrite(toGunPin, 0x1);
-        decode_message();
+        digitalWrite(vest.to_gun, 0x1);
+        vest.shot_by = decode_message();
     }
     else
     {
-        digitalWrite(toGunPin, 0x0);
-        if ((tod > 0) && ((millis() - tod) > death_time))
+        digitalWrite(vest.to_gun, 0x0);
+        while ((vest.tod > 0) && ((millis() - vest.tod) < vest.lockout_time))
         {
-            alive = true;
-            tod = 0;
-            ledstate = 0x1;
-            digitalWrite(ledpin, ledstate);
-            for(int i = 0; i < npixels; i++)
-            {
-                strip.setPixelColor(i, teamcolor);
-            }
-            strip.show();
-            irrecv.resume();
+            blinkLeds();
+            sendSignal(vest, plnum);
         }
-        else
-        {
-            blink_led();
-        }
+        vest.alive = true;
+        vest.tod = 0;
+        vest.ledstate = 0x1;
+        vest.shot_by = 0;
+        digitalWrite(vest.ledpin, vest.ledstate);
+        set_strip_color(vest, teamcolor);
+        vest.irrecv.enableIRIn();
+        vest.irrecv.resume();
     }
-
-    delay(10);
 
 }
 
-void decode_message()
+unsigned long decode_message()
 {
     unsigned long val = 0;
-    unsigned long plnum = 0;
+    unsigned long to = 0;
+    unsigned long from = 0;
     unsigned long t = 0;
     unsigned long chk = 0;
 
-    if (irrecv.decode(&results))
+    if (vest.irrecv.decode(&vest.results))
     {
+
         val = results.value;
         t = (val >> 24);
-        plnum = (val & 0x00FF0000) >> 16;
+        from = (val & 0x00FF0000) >> 16;
+        to = (val & 0x0000FF00) >> 8;
         chk = (val & 0x000000FF);
 
-        if(chk != ((t + plnum) % 255))
+        if(chk == checksum(val))
         {
-        }
-        else
-        {
-            if(t != team && t != COMMAND)
+            if(t != vest.team && t != COMMAND)
             {
-                alive = false;
-                tod = millis();
-                led_timer = millis();
-                send_signal(plnum);
-                return;
+                vest.alive = false;
+                vest.tod = millis();
+                vest.blink_timer = millis();
+                return from;
             }
+            if (t == COMMAND)
+            {
 
+                if (to == vest.player_num && from != vest.player_num)
+                {
+                    vest.score++;
+                }
+            }
         }
-        irrecv.resume(); // Receive the next value
+        vest.irrecv.enableIRIn();
+        vest.irrecv.resume();
     }
 }
 
-void send_signal(unsigned long plnum)
-{
-    unsigned long flash_msg = 0;
-
-    flash_msg = (((unsigned long) COMMAND) << 24) | (((unsigned long) plnum) << 16 | (((unsigned long) PLAYER_NUMBER) << 8);
-
-    for (int i = 0; i < 3; i++)
-    {
-        irsend.sendSony(flash_msg, 32);
-    }
-}
-
-void blink_led()
-{
-    if((millis() - led_timer) >= 300)
-    {
-        led_timer = millis();
-        if (ledstate == 0x1)
-        {
-            for(int i = 0; i < npixels; i++)
-            {
-                strip.setPixelColor(i, 255, 0, 0);
-            }
-            ledstate = 0x0;
-            digitalWrite(ledpin, ledstate);
-        }
-        else
-        {
-            for(int i = 0; i < npixels; i++)
-            {
-                strip.setPixelColor(i, teamcolor);
-            }
-            ledstate = 0x1;
-            digitalWrite(ledpin, ledstate);
-        }
-        strip.show();
-    }
-}
 
 
 void play_sound(uint16_t num)
 {
 
-        sendbuf[0] = 0x7e; //starting byte
-        sendbuf[1] = 0xff; //version
-        sendbuf[2] = 0x06; //the number of bytes of the command without starting byte and ending byte
-        sendbuf[3] = 0x03; //
-        sendbuf[4] = 0x00; //0x00 = no feedback, 0x01 = feedback
-        sendbuf[5] = (int8_t)(num >> 8);//datah
-        sendbuf[6] = (int8_t)(num); //datal
-        sendbuf[7] = 0xef; //ending byte
+        vest.sendbuf[0] = 0x7e; // Starting byte
+        vest.sendbuf[1] = 0xff; // Version
+        vest.sendbuf[2] = 0x06; // The number of bytes of the command without starting byte and ending byte
+        vest.sendbuf[3] = 0x03; // Command
+        vest.sendbuf[4] = 0x00; // 0x00 = no feedback, 0x01 = feedback
+        vest.sendbuf[5] = (int8_t)(num >> 8); // datah
+        vest.sendbuf[6] = (int8_t)(num); // datal
+        vest.sendbuf[7] = 0xef; // Ending byte
+
         for(uint8_t i=0; i<8; i++)
         {
-            ser.write(sendbuf[i]);
+            vest.ser.write(sendbuf[i]);
         }
-        if (num == 1)
-        {
-            gunsound = !gunsound;
-        }
+}
+
+
+
+
+unsigned long checksum(unsigned long msg)
+{
+    unsigned long team = (msg >> 24);
+    unsigned long plnum = (msg & 0x00FF0000) >> 16;
+
+    unsigned long chksum = (team + plnum) % 255;
+
+    return chksum;
 }

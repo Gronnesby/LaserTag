@@ -11,13 +11,13 @@
   },
   {
     "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/vest_workaround/sketch/vest_workaround.ino.cpp",
-    "Include": "IRremote.h",
-    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote"
+    "Include": "LaserVest.h",
+    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag"
   },
   {
     "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/vest_workaround/sketch/vest_workaround.ino.cpp",
-    "Include": "LaserTag.h",
-    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag"
+    "Include": "IRremote.h",
+    "Includepath": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote"
   },
   {
     "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/vest_workaround/sketch/vest_workaround.ino.cpp",
@@ -31,6 +31,21 @@
   },
   {
     "Sourcefile": "/Users/gronnesby/Documents/arduino/.build/vest_workaround/sketch/vest_workaround.ino.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserGun.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserTag.cpp",
+    "Include": "",
+    "Includepath": ""
+  },
+  {
+    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserVest.cpp",
     "Include": "",
     "Includepath": ""
   },
@@ -131,21 +146,6 @@
   },
   {
     "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/Arduino-IRremote/ir_Whynter.cpp",
-    "Include": "",
-    "Includepath": ""
-  },
-  {
-    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserGun.cpp",
-    "Include": "",
-    "Includepath": ""
-  },
-  {
-    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserTag.cpp",
-    "Include": "",
-    "Includepath": ""
-  },
-  {
-    "Sourcefile": "/Users/gronnesby/Documents/Arduino/libraries/LaserTag/LaserVest.cpp",
     "Include": "",
     "Includepath": ""
   },

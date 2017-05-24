@@ -1,200 +1,149 @@
 
-#include <IRremote.h>
-#include <Adafruit_NeoPixel.h>
-#include <SoftwareSerial.h>
+#include <LaserVest.h>
 
 #define CMD_PLAY_W_INDEX 0x03
 
-int SERIAL_RX = 5;
-int SERIAL_TX = 6;
-int PLAYER_NUMBER = 23;
-int COMMAND = 0x0;
-int TEAM_A = 0x01;
-int TEAM_B = 0x02;
-
-int RECV_PIN = 9;
-IRrecv irrecv = IRrecv(RECV_PIN);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(17, 12, NEO_RGB + NEO_KHZ800);
+SoftwareSerial ser(5, 6);
+IRrecv irrecv = IRrecv(9);
 IRsend irsend = IRsend();
 decode_results results;
 
-int toGunPin = 10;
-int fromGunPin = 11;
-int gunsound = HIGH;
-int ledpin = 13;
-int ledstate = HIGH;
+laser_vest_t vest
+{
+    10,     // To gun pin
+    11,     // From gun pin
+    13,     // White led pin (white leds on the sensor plates)
+    HIGH,   // Ledstate
 
-uint16_t team = TEAM_A;
-uint32_t teamcolor;
-bool alive = true;
-int flashback = 0;
+    3,      // Player num
+    TEAM_B, // Team
+    0x0,    // Teamcolor
 
-long tod = 0;
-long death_time = 6000;
-long led_timer = 0;
+    true,   // Alive or not
+    0,      // Time of death
+    0,      // Shot by
+    6000,   // Lockout time
+    300000, // Game time
+    0,      // Blink timer
+    0,      // Score
 
-int npixels = 17;
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(npixels, 12, NEO_RGB + NEO_KHZ800);
-SoftwareSerial ser(SERIAL_RX, SERIAL_TX);
-int8_t sendbuf[8] = {0};
+    12,     // Pixel data pin
+    17,     // Num pixels
+    strip,  // Pixel strip object
+
+    irrecv, // Ir receive object
+    irsend, // Ir send object
+    decode_results{}    // Ir results
+};
+
 
 void setup()
 {
-    Serial.begin(9600);
-    ser.begin(9600);
-    irrecv.enableIRIn(); // Start the receiver
+    vest.recv.enableIRIn();
 
-    pinMode(ledpin, OUTPUT);
-    pinMode(toGunPin, OUTPUT);
-    pinMode(fromGunPin, INPUT);
-    digitalWrite(ledpin, ledstate);
-    digitalWrite(toGunPin, HIGH);
 
-    strip.begin();
+    pinMode(vest.white_leds, OUTPUT);
+    pinMode(vest.to_gun, OUTPUT);
+    pinMode(vest.from_gun, INPUT);
+    digitalWrite(vest.white_leds, vest.ledstate);
+    digitalWrite(vest.to_gun, HIGH);
 
-    if (team == TEAM_B)
+    vest.strip.begin();
+    vest.teamcolor = (vest.team == TEAM_A) ? vest.strip.Color(0, 0, 255) : vest.strip.Color(0, 255, 0);
+    
+    for(int i = 0; i < vest.npixels; i++)
     {
-        teamcolor = strip.Color(0, 255, 0);
+        vest.strip.setPixelColor(i, vest.teamcolor);
     }
-    else
-    {
-        teamcolor = strip.Color(0, 0, 255);
-    }
-        
-    for(int i = 0; i < npixels; i++)
-    {
-        strip.setPixelColor(i, teamcolor);
-    }
-    strip.show();
+    vest.strip.show();
 }
 
 void loop() {
 
-    if(alive)
+    
+    if(vest.alive)
     {
-        digitalWrite(toGunPin, HIGH);
-        decode_message();
+        enableWeapon(vest);
+        vest.shot_by = decode_message();
     }
     else
     {
-        digitalWrite(toGunPin, LOW);
-        while ((tod > 0) && ((millis() - tod) < death_time))
+        disableWeapon(vest);
+        while ((vest.tod > 0) && ((millis() - vest.tod) < vest.lockout_time))
         {
-            blink_led();
+            blinkLeds(vest);
+            sendSignal(vest);
         }
-        alive = true;
-        tod = 0;
-        ledstate = HIGH;
-        digitalWrite(ledpin, ledstate);
-        set_strip_color(teamcolor);
-        Serial.println("Resuming IR");
-        irrecv.enableIRIn();
-        irrecv.resume();
+        vest.alive = true;
+        vest.tod = 0;
+        vest.ledstate = HIGH;
+        vest.shot_by = 0;
+        digitalWrite(vest.white_leds, vest.ledstate);
+        setStripColor(vest, vest.teamcolor);
+        vest.recv.enableIRIn();
+        vest.recv.resume();
     }
 
 }
 
-void decode_message()
+unsigned long decode_message()
 {
     unsigned long val = 0;
-    unsigned long plnum = 0;
+    unsigned long to = 0;
+    unsigned long from = 0;
     unsigned long t = 0;
     unsigned long chk = 0;
 
-    if (irrecv.decode(&results))
+    if (vest.recv.decode(&vest.results))
     {
         
         val = results.value;
-        Serial.println(val);
         t = (val >> 24);
-        plnum = (val & 0x00FF0000) >> 16;
+        from = (val & 0x00FF0000) >> 16;
+        to = (val & 0x0000FF00) >> 8;
         chk = (val & 0x000000FF);
 
-        if(chk == ((t + plnum) % 255))
+        if(chk == checksum(val))
         {
-            if(t != team && t != COMMAND)
+            if(t != vest.team && t != COMMAND)
             {
-                alive = false;
-                tod = millis();
-                led_timer = millis();
-                send_signal(plnum);
-                return;
+                vest.alive = false;
+                vest.tod = millis();
+                vest.blink_timer = millis();
+                return from;
+            }
+            if (t == COMMAND)
+            {
+
+                if (to == vest.player_num && from != vest.player_num)
+                {
+                    vest.score++;
+                }
             }
         }
-        irrecv.enableIRIn();
-        irrecv.resume();
-    }
-}
-
-void send_signal(unsigned long plnum)
-{
-    unsigned long flash_msg = 0;
-    flash_msg = (((unsigned long) COMMAND) << 24) | (((unsigned long) plnum) << 16) | (((unsigned long) PLAYER_NUMBER) << 8);
-    for (int i = 0; i < 3; i++)
-    {
-        irsend.sendSony(flash_msg, 32);
-    }
-    return;
-}
-
-void blink_led()
-{
-    if((millis() - led_timer) >= 300)
-    {
-        led_timer = millis();
-        if (ledstate == HIGH)
-        {
-            set_strip_color(0xFF000000);
-            ledstate = LOW;
-            digitalWrite(ledpin, ledstate);
-        }
-        else
-        {
-            set_strip_color(teamcolor);
-            ledstate = HIGH;
-            digitalWrite(ledpin, ledstate);
-        }
-        strip.show();
+        vest.recv.enableIRIn();
+        vest.recv.resume();
     }
 }
 
 
-void play_sound(uint16_t num)
-{
+// Playing mp3 sounds is currently not implemented
+// void play_sound(uint16_t num)
+// {
 
-        sendbuf[0] = 0x7e; //starting byte
-        sendbuf[1] = 0xff; //version
-        sendbuf[2] = 0x06; //the number of bytes of the command without starting byte and ending byte
-        sendbuf[3] = CMD_PLAY_W_INDEX; //
-        sendbuf[4] = 0x00; //0x00 = no feedback, 0x01 = feedback
-        sendbuf[5] = (int8_t)(num >> 8);//datah
-        sendbuf[6] = (int8_t)(num); //datal
-        sendbuf[7] = 0xef; //ending byte
-        for(uint8_t i=0; i<8; i++)
-        {
-            ser.write(sendbuf[i]);
-        }
-        if (num == 1)
-        {
-            gunsound = !gunsound;
-        }
-}
+//         vest.sendbuf[0] = 0x7e;                  // Starting byte
+//         vest.sendbuf[1] = 0xff;                  // Version
+//         vest.sendbuf[2] = 0x06;                  // The number of bytes of the command without starting byte and ending byte
+//         vest.sendbuf[3] = CMD_PLAY_W_INDEX;      // Command
+//         vest.sendbuf[4] = 0x00;                  // 0x00 = no feedback, 0x01 = feedback
+//         vest.sendbuf[5] = (int8_t)(num >> 8);    // datah
+//         vest.sendbuf[6] = (int8_t)(num);         // datal
+//         vest.sendbuf[7] = 0xef;                  // Ending byte
+        
+//         for(uint8_t i=0; i<8; i++)
+//         {
+//             vest.ser.write(sendbuf[i]);
+//         }
+// }
 
-
-void set_strip_color(uint32_t col)
-{
-        for(int i = 0; i < npixels; i++)
-        {
-            strip.setPixelColor(i, col);
-        }
-        strip.show();
-}
-
-unsigned long checksum(unsigned long msg)
-{
-    unsigned long team = (msg >> 24);
-    unsigned long plnum = (msg & 0x00FF0000) >> 16;
-
-    unsigned long chksum = (team + plnum) % 255;
-
-    return chksum;
-}
