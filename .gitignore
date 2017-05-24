@@ -35,8 +35,9 @@ bin2header_0.0.1/
 .DS_Store/
 .DS_Store
 .vscode
+.build/
 
 *.xcworkspace
 
 *.mp3
-*.mp4
+*.m4a

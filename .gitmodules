@@ -1,3 +1,9 @@
 [submodule "Arduino-IRremote"]
 	path = libraries/Arduino-IRremote
 	url = https://github.com/z3t0/Arduino-IRremote
+[submodule "libraries/Arduino-IRremote"]
+	path = libraries/Arduino-IRremote
+	url = git@github.com:z3t0/Arduino-IRremote
+[submodule "libraries/Adafruit_NeoPixel"]
+	path = libraries/Adafruit_NeoPixel
+	url = git@github.com:adafruit/Adafruit_NeoPixel
