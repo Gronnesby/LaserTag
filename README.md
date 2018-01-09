@@ -3,7 +3,7 @@ Library and sketch code for an Arduino-based Laser Tag game.
 
 The code is part of a cooperation project between [Kodeklubben Tromsø](https://kodeklubben-tromso.github.io/) (Tromsø Code Club) and [Nordnorsk Vitensenter](https://nordnorsk.vitensenter.no/) (Northern Norwegian Science Museum) called *Skills Makerlab.* The *Makerlab* is a free evening activity for kids between 13-19 years.
 
-![Complete kit](https://scontent.xx.fbcdn.net/v/t31.0-8/18401898_10155061512531900_983292205395623313_o.jpg?oh=edbca662a01b6b1cb04dc274fcc876a9&oe=59B81770)
+![Complete kit](img/completekit.jpg)
 
 
 ### Hardware
@@ -33,7 +33,7 @@ Version 1.0 have been developed during the last *Makerlab* courses.
 - A laser marker, visual only.
 - Trigger debouncing.
 
-![Laser gun](https://scontent.xx.fbcdn.net/v/t31.0-8/18359180_10155061515566900_3134174036395336535_o.jpg?oh=8f758050f13dd674f829320cf4fd9025&oe=59A0B941)
+![Laser gun](img/gun.jpg)
 
 **Laser Vest**
 
@@ -42,7 +42,7 @@ Version 1.0 have been developed during the last *Makerlab* courses.
 - Responding to being tagged by another player by flashing a message back.
 - Neopixel team color markers.
 
-![Laser Vest](https://scontent.xx.fbcdn.net/v/t31.0-8/18401987_10155061515271900_7317352323706589476_o.jpg?oh=11c1297a612d7cddb0c001485adbe646&oe=59AA39F1)
+![Laser Vest](img/vest.jpg)
 
 ## Version 2.0
 Version 2.0 is currently under development, some of the planned features are:
